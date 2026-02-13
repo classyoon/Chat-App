@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ChatView: View {
     @State private var viewModel = ChatViewModel()
+    @State private var speechManager = SpeechManager()
     @State private var inputText = ""
     @FocusState private var isInputFocused: Bool
 
@@ -35,12 +36,31 @@ struct ChatView: View {
 
                 Divider()
 
+                // Live transcription overlay
+                if speechManager.isRecording && !speechManager.transcribedText.isEmpty {
+                    Text(speechManager.transcribedText)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .transition(.opacity)
+                }
+
                 HStack(alignment: .bottom, spacing: 8) {
-                    TextField("Message...", text: $inputText, axis: .vertical)
-                        .lineLimit(1...5)
-                        .textFieldStyle(.roundedBorder)
-                        .focused($isInputFocused)
-                        .onSubmit { send() }
+                    TextField(
+                        speechManager.isRecording ? "Listening..." : "Message...",
+                        text: $inputText,
+                        axis: .vertical
+                    )
+                    .lineLimit(1...5)
+                    .textFieldStyle(.roundedBorder)
+                    .focused($isInputFocused)
+                    .onSubmit { send() }
+                    .disabled(speechManager.isRecording)
+
+                    // Mic button with hold-to-talk gesture
+                    micButton
 
                     Button {
                         send()
@@ -66,12 +86,56 @@ struct ChatView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Clear") {
-                        viewModel.clearConversation()
+                    HStack(spacing: 12) {
+                        Button {
+                            speechManager.autoReadEnabled.toggle()
+                        } label: {
+                            Image(systemName: speechManager.autoReadEnabled ? "speaker.wave.2.fill" : "speaker.slash")
+                        }
+                        Button("Clear") {
+                            viewModel.clearConversation()
+                            speechManager.stopSpeaking()
+                        }
                     }
                 }
             }
+            .onChange(of: viewModel.messages.last?.isStreaming) { oldValue, newValue in
+                if oldValue == true && newValue == false,
+                   let lastMessage = viewModel.messages.last,
+                   lastMessage.role == .assistant,
+                   speechManager.autoReadEnabled {
+                    speechManager.speak(lastMessage.content)
+                }
+            }
+            .task {
+                await speechManager.requestPermissions()
+            }
         }
+    }
+
+    private var micButton: some View {
+        Image(systemName: speechManager.isRecording ? "mic.fill" : "mic")
+            .font(.title)
+            .foregroundStyle(speechManager.isRecording ? .red : .blue)
+            .symbolEffect(.pulse, isActive: speechManager.isRecording)
+            .frame(width: 44, height: 44)
+            .contentShape(Rectangle())
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in
+                        if !speechManager.isRecording && !viewModel.isSending && !speechManager.permissionsDenied {
+                            speechManager.startRecording()
+                        }
+                    }
+                    .onEnded { _ in
+                        let text = speechManager.stopRecording()
+                        if !text.isEmpty {
+                            Task { await viewModel.sendMessage(text) }
+                        }
+                    }
+            )
+            .opacity(speechManager.permissionsDenied || viewModel.isSending ? 0.4 : 1.0)
+            .allowsHitTesting(!speechManager.permissionsDenied && !viewModel.isSending)
     }
 
     private func send() {
