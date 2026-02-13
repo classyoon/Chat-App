@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FoundationModels
+import NaturalLanguage
 
 @Observable
 class ChatViewModel {
@@ -14,10 +15,31 @@ class ChatViewModel {
     var isSending = false
 
     private var session: LanguageModelSession
+    private let systemInstructions = "You are a helpful, friendly assistant. Keep responses concise and clear."
+    private let contextWindowSize = 4096
+
+    var estimatedTokensUsed: Int {
+        let allText = systemInstructions + " " + messages.map(\.content).joined(separator: " ")
+        let tokenizer = NLTokenizer(unit: .word)
+        tokenizer.string = allText
+        var wordCount = 0
+        tokenizer.enumerateTokens(in: allText.startIndex..<allText.endIndex) { _, _ in
+            wordCount += 1
+            return true
+        }
+        return Int(Double(wordCount) * 1.3)
+    }
+
+    var contextUsagePercent: Double {
+        min(Double(estimatedTokensUsed) / Double(contextWindowSize), 1.0)
+    }
+
+    var isNearContextLimit: Bool {
+        contextUsagePercent > 0.8
+    }
 
     init() {
-        let instructions = "You are a helpful, friendly assistant. Keep responses concise and clear."
-        session = LanguageModelSession(instructions: instructions)
+        session = LanguageModelSession(instructions: systemInstructions)
         Task { try? await session.prewarm() }
     }
 
@@ -51,7 +73,6 @@ class ChatViewModel {
 
     func clearConversation() {
         messages.removeAll()
-        let instructions = "You are a helpful, friendly assistant. Keep responses concise and clear."
-        session = LanguageModelSession(instructions: instructions)
+        session = LanguageModelSession(instructions: systemInstructions)
     }
 }

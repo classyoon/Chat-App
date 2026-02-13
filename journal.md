@@ -12,3 +12,6 @@
   - Rewrote `Chat_AppApp.swift` (stripped SwiftData ModelContainer)
   - Deleted `Item.swift` (no longer needed)
   - Updated `CLAUDE.md` to reflect new architecture
+- Added context window usage tracker:
+  - `ChatViewModel.swift`: Estimate token usage via `NaturalLanguage` tokenizer, expose usage percent and near-limit flag; extract system instructions to a shared property
+  - `ChatView.swift`: Added toolbar progress bar and token count label that turns red near the 4096-token limit

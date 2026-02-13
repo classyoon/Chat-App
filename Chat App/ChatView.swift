@@ -55,6 +55,16 @@ struct ChatView: View {
             .navigationTitle("Chat")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        ProgressView(value: viewModel.contextUsagePercent)
+                            .tint(viewModel.isNearContextLimit ? .red : .blue)
+                            .frame(width: 100)
+                        Text("\(viewModel.estimatedTokensUsed) / 4096 tokens")
+                            .font(.caption2)
+                            .foregroundStyle(viewModel.isNearContextLimit ? .red : .secondary)
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Clear") {
                         viewModel.clearConversation()
