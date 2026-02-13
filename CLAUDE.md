@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-iOS chat application built with Swift 5.0, SwiftUI, and SwiftData. Xcode project located at `Chat App/Chat App.xcodeproj`. Currently a fresh scaffold with basic item CRUD — intended to evolve into a full chat/messaging app.
+iOS chat application powered by Apple's on-device Foundation Models framework (iOS 26+). Uses the same 3B-parameter LLM that powers Apple Intelligence — runs entirely on-device, free, no API keys needed. Xcode project located at `Chat App/Chat App.xcodeproj`.
 
 ## Build & Test Commands
 
@@ -13,31 +13,44 @@ iOS chat application built with Swift 5.0, SwiftUI, and SwiftData. Xcode project
 xcodebuild -scheme "Chat App" -project "Chat App/Chat App.xcodeproj" -configuration Debug build
 
 # Run on simulator
-xcodebuild -scheme "Chat App" -project "Chat App/Chat App.xcodeproj" -destination 'platform=iOS Simulator,name=iPhone 16' build
+xcodebuild -scheme "Chat App" -project "Chat App/Chat App.xcodeproj" -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
 
 # Run all tests
-xcodebuild -scheme "Chat App" -project "Chat App/Chat App.xcodeproj" test -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild -scheme "Chat App" -project "Chat App/Chat App.xcodeproj" test -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 
 # Run a single test
-xcodebuild -scheme "Chat App" -project "Chat App/Chat App.xcodeproj" test -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:"Chat AppTests/Chat_AppTests/testExample"
+xcodebuild -scheme "Chat App" -project "Chat App/Chat App.xcodeproj" test -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:"Chat AppTests/Chat_AppTests/testExample"
 ```
 
 ## Architecture
 
-**Entry point:** `Chat_AppApp.swift` — creates a SwiftData `ModelContainer` with SQLite persistence and injects it into the SwiftUI view hierarchy via `.modelContainer()`.
+**Entry point:** `Chat_AppApp.swift` — minimal `@main` App struct, renders `ContentView`.
 
-**Data flow:** SwiftData `@Model` classes are queried in views using `@Query` and mutated through `@Environment(\.modelContext)`. Currently there is one model (`Item`) with a single `timestamp` property.
+**Availability gate:** `ContentView.swift` checks `SystemLanguageModel.default.availability`. Shows `ChatView` if the on-device model is available, otherwise shows a `ContentUnavailableView` with guidance.
 
-**UI:** `ContentView` uses `NavigationSplitView` for a master-detail layout. Items are listed, added, and deleted inline.
+**Data model:** `ChatMessage.swift` — `Identifiable` struct with `id`, `role` (`.user`/`.assistant`), `content`, `timestamp`, and `isStreaming` flag. No persistence (conversation resets on launch).
+
+**ViewModel:** `ChatViewModel.swift` — `@Observable` class managing a `LanguageModelSession` (from `FoundationModels`). Handles sending messages, streaming responses via `session.streamResponse(to:)`, prewarming the model, and clearing conversations.
+
+**Views:**
+- `ChatView.swift` — main chat UI with `ScrollViewReader` + `LazyVStack` for messages, auto-scrolling, expanding text input, and a Clear toolbar button
+- `MessageBubbleView.swift` — styled chat bubbles (user=blue/right, assistant=gray/left) with streaming indicator
 
 **Capabilities configured:** iCloud CloudKit sync and push notifications are enabled in entitlements/Info.plist.
 
 ## Key Build Settings
 
 - Deployment target: iOS 26.2 (iPhone + iPad)
-- Swift concurrency: `MainActor` default actor isolation enabled
+- Swift concurrency: `MainActor` default actor isolation enabled (`SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`)
 - Bundle ID: `con.yoon.Chat-App`
 - No external dependencies — pure Apple frameworks
+- Uses `PBXFileSystemSynchronizedRootGroup` — new files on disk are auto-detected by Xcode
+
+## Key Technical Notes
+
+- All types are implicitly `@MainActor` due to build settings. The streaming `for try await` loop runs on MainActor; `LanguageModelSession` does heavy work internally off-thread.
+- The on-device model has a ~4,096 token context window. The Clear button lets users reset when conversations get long.
+- Foundation Models framework is only available on iOS 26+ devices with Apple Intelligence enabled. The Simulator will show the unavailability screen.
 
 ## On Commit
 
