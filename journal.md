@@ -19,3 +19,4 @@
   - Created `SpeechManager.swift`: `@Observable` class with on-device speech-to-text (AVAudioEngine + SFSpeechRecognizer) and text-to-speech (AVSpeechSynthesizer)
   - Updated `ChatView.swift`: Hold-to-talk mic button via DragGesture, live transcription overlay, auto-read toggle in toolbar, TTS triggered on streaming completion
   - Updated `Info.plist`: Added NSMicrophoneUsageDescription and NSSpeechRecognitionUsageDescription
+- Added `README.md` with project overview, features, requirements, architecture, and build instructions
