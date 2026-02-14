@@ -11,6 +11,7 @@ struct ChatView: View {
     @State private var viewModel = ChatViewModel()
     @State private var speechManager = SpeechManager()
     @State private var inputText = ""
+    @State private var showMemoryView = false
     @FocusState private var isInputFocused: Bool
 
     var body: some View {
@@ -88,6 +89,11 @@ struct ChatView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 12) {
                         Button {
+                            showMemoryView = true
+                        } label: {
+                            Image(systemName: "brain")
+                        }
+                        Button {
                             speechManager.autoReadEnabled.toggle()
                         } label: {
                             Image(systemName: speechManager.autoReadEnabled ? "speaker.wave.2.fill" : "speaker.slash")
@@ -109,6 +115,9 @@ struct ChatView: View {
             }
             .task {
                 await speechManager.requestPermissions()
+            }
+            .sheet(isPresented: $showMemoryView) {
+                MemoryView()
             }
         }
     }

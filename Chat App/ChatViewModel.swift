@@ -8,6 +8,7 @@
 import SwiftUI
 import FoundationModels
 import NaturalLanguage
+import CoreLocation
 
 @Observable
 class ChatViewModel {
@@ -15,8 +16,10 @@ class ChatViewModel {
     var isSending = false
 
     private var session: LanguageModelSession
-    private let systemInstructions = "You are a helpful, friendly assistant. Keep responses concise and clear."
+    private let systemInstructions = "You are a helpful, friendly assistant named ConPal. Keep responses concise and clear. Use the memory tool to remember the last few messages you've received. Greet the user by name after the first message."
     private let contextWindowSize = 4096
+    private let locationManager = CLLocationManager()
+    private let tools: [any Tool] = [GetCurrentTimeTool(), GetCurrentLocationTool(), CountLettersTool(), MemoryTool()]
 
     var estimatedTokensUsed: Int {
         let allText = systemInstructions + " " + messages.map(\.content).joined(separator: " ")
@@ -39,7 +42,8 @@ class ChatViewModel {
     }
 
     init() {
-        session = LanguageModelSession(instructions: systemInstructions)
+        session = LanguageModelSession(tools: tools, instructions: systemInstructions)
+        locationManager.requestWhenInUseAuthorization()
         Task { try? await session.prewarm() }
     }
 
@@ -73,6 +77,6 @@ class ChatViewModel {
 
     func clearConversation() {
         messages.removeAll()
-        session = LanguageModelSession(instructions: systemInstructions)
+        session = LanguageModelSession(tools: tools, instructions: systemInstructions)
     }
 }

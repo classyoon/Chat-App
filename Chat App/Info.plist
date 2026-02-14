@@ -6,6 +6,8 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app uses your location to answer questions about where you are.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app uses the microphone for voice input.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

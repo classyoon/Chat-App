@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CAB15A962F3FDB7A00A1D873 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = CAB15A952F3FDB7A00A1D873 /* README.md */; };
+		CAB15A972F3FDB7A00A1D873 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = CAB15A932F3FDB7A00A1D873 /* CLAUDE.md */; };
+		CAB15A982F3FDB7A00A1D873 /* journal.md in Resources */ = {isa = PBXBuildFile; fileRef = CAB15A942F3FDB7A00A1D873 /* journal.md */; };
+		CAB15AA82F41030600A1D873 /* MemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAB15AA72F41030600A1D873 /* MemoryView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		CAB15A242F3FC15F00A1D873 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +34,10 @@
 		CAB15A122F3FC15E00A1D873 /* Chat App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Chat App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAB15A232F3FC15F00A1D873 /* Chat AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Chat AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAB15A2D2F3FC15F00A1D873 /* Chat AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Chat AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAB15A932F3FDB7A00A1D873 /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
+		CAB15A942F3FDB7A00A1D873 /* journal.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = journal.md; sourceTree = "<group>"; };
+		CAB15A952F3FDB7A00A1D873 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		CAB15AA72F41030600A1D873 /* MemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -88,10 +99,14 @@
 		CAB15A092F3FC15E00A1D873 = {
 			isa = PBXGroup;
 			children = (
+				CAB15A932F3FDB7A00A1D873 /* CLAUDE.md */,
+				CAB15A942F3FDB7A00A1D873 /* journal.md */,
+				CAB15A952F3FDB7A00A1D873 /* README.md */,
 				CAB15A142F3FC15E00A1D873 /* Chat App */,
 				CAB15A262F3FC15F00A1D873 /* Chat AppTests */,
 				CAB15A302F3FC15F00A1D873 /* Chat AppUITests */,
 				CAB15A132F3FC15E00A1D873 /* Products */,
+				CAB15AA72F41030600A1D873 /* MemoryView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -225,6 +240,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAB15A962F3FDB7A00A1D873 /* README.md in Resources */,
+				CAB15A972F3FDB7A00A1D873 /* CLAUDE.md in Resources */,
+				CAB15A982F3FDB7A00A1D873 /* journal.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,6 +267,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAB15AA82F41030600A1D873 /* MemoryView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

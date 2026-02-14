@@ -20,3 +20,15 @@
   - Updated `ChatView.swift`: Hold-to-talk mic button via DragGesture, live transcription overlay, auto-read toggle in toolbar, TTS triggered on streaming completion
   - Updated `Info.plist`: Added NSMicrophoneUsageDescription and NSSpeechRecognitionUsageDescription
 - Added `README.md` with project overview, features, requirements, architecture, and build instructions
+
+## 2026-02-14
+
+- Added Foundation Models tools to extend on-device LLM capabilities:
+  - Created `GetCurrentTimeTool.swift`: Tool that returns the current date and time via DateFormatter
+  - Created `GetCurrentLocationTool.swift`: Tool that gets the user's city/location using CLLocationUpdate.liveUpdates() and CLGeocoder reverse geocoding
+  - Created `CountLettersTool.swift`: Tool that accurately counts letters in a word (compensates for LLM character-counting weakness)
+  - Created `MemoryTool.swift`: Tool for persisting conversation context across messages
+  - Created `MemoryView.swift`: Sheet view for viewing stored memories, accessible via brain icon in toolbar
+- Updated `ChatViewModel.swift`: Registered all tools with LanguageModelSession, added CoreLocation import and location authorization request, updated system instructions with assistant name "ConPal"
+- Updated `ChatView.swift`: Added brain toolbar button and MemoryView sheet presentation
+- Updated `Info.plist`: Added NSLocationWhenInUseUsageDescription for location permission
